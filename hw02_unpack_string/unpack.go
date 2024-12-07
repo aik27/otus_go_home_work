@@ -8,8 +8,10 @@ import (
 	"unicode"
 )
 
-var ErrInvalidString = errors.New("invalid string")
-var ErrInvalidAtoi = errors.New("invalid cast to int")
+var (
+	ErrInvalidString = errors.New("invalid string")
+	ErrInvalidAtoi   = errors.New("invalid cast to int")
+)
 
 func Unpack(str string) (string, error) {
 	var res strings.Builder
@@ -38,7 +40,6 @@ func Unpack(str string) (string, error) {
 
 		if unicode.IsDigit(char) {
 			num, err := strconv.Atoi(string(char))
-
 			if err != nil {
 				return "", ErrInvalidAtoi
 			}
