@@ -2,43 +2,60 @@ package hw02unpackstring
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
 )
 
 var ErrInvalidString = errors.New("invalid string")
+var ErrInvalidAtoi = errors.New("invalid cast to int")
 
 func Unpack(str string) (string, error) {
 	var res strings.Builder
 	var prev rune
+	var isPrevSlash bool
 
-	for i, v := range str {
-		if unicode.IsDigit(v) {
-			if i == 0 || unicode.IsDigit(prev) {
-				return "", ErrInvalidString
-			}
-			num, _ := strconv.Atoi(string(v))
+	re := regexp.MustCompile(`^(([a-zA-Z\x{1F600}-\x{1F64F}])+\d?|\\+\d+)*$`)
+	ok := re.Match([]byte(str))
 
-			if num == 0 {
-				tmp := res.String()
-				res = strings.Builder{}
-				res.WriteString(removeCharAt(tmp, i-1))
-			} else {
-				res.WriteString(strings.Repeat(string(prev), num-1))
-			}
-		} else {
-			res.WriteRune(v)
+	if !ok {
+		return "", ErrInvalidString
+	}
+
+	for _, char := range str {
+		if isPrevSlash {
+			res.WriteRune(prev)
+			isPrevSlash = false
+			prev = char
+			continue
 		}
-		prev = v
+
+		if string(char) == `\` {
+			isPrevSlash = true
+			continue
+		}
+
+		if unicode.IsDigit(char) {
+			num, err := strconv.Atoi(string(char))
+
+			if err != nil {
+				return "", ErrInvalidAtoi
+			}
+
+			res.WriteString(strings.Repeat(string(prev), num))
+			prev = 0
+		} else {
+			if prev != 0 {
+				res.WriteRune(prev)
+			}
+			prev = char
+		}
+	}
+
+	if prev != 0 {
+		res.WriteRune(prev)
 	}
 
 	return res.String(), nil
-}
-
-func removeCharAt(str string, pos int) string {
-	if pos < 0 || pos >= len(str) {
-		return str
-	}
-	return str[:pos] + str[pos+1:]
 }
