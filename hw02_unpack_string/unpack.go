@@ -13,13 +13,14 @@ var (
 	ErrInvalidAtoi   = errors.New("invalid cast to int")
 )
 
+var reg = regexp.MustCompile(`^(([a-zA-Z\x{1F600}-\x{1F64F}])+\d?|\\+\d+)*$`)
+
 func Unpack(str string) (string, error) {
 	var res strings.Builder
 	var prev rune
 	var isPrevSlash bool
 
-	re := regexp.MustCompile(`^(([a-zA-Z\x{1F600}-\x{1F64F}])+\d?|\\+\d+)*$`)
-	ok := re.Match([]byte(str))
+	ok := reg.Match([]byte(str))
 
 	if !ok {
 		return "", ErrInvalidString
@@ -54,6 +55,7 @@ func Unpack(str string) (string, error) {
 		}
 	}
 
+	// don't miss last char
 	if prev != 0 {
 		res.WriteRune(prev)
 	}
