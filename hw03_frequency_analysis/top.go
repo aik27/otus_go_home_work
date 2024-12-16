@@ -1,4 +1,4 @@
-package main
+package hw03frequencyanalysis
 
 import (
 	"regexp"
@@ -7,15 +7,35 @@ import (
 	"strings"
 )
 
-var reg = regexp.MustCompile(`\s+`)
+var (
+	reSpace = regexp.MustCompile(`\s+`)
+	reClean = regexp.MustCompile(`^[^\p{L}]+|[^\p{L}]+$`)
+)
 
-type Word struct {
+type word struct {
 	str string
 	hit int
 }
 
-func (w *Word) increase() {
+func (w *word) incHit() {
 	w.hit++
+}
+
+func findWordByStr(str string, words []*word) *word {
+	for _, val := range words {
+		if val.str == str {
+			return val
+		}
+	}
+	return nil
+}
+
+func cleanStr(str string) string {
+	if len(str) == 1 && str == "-" {
+		return ""
+	}
+	str = strings.ToLower(str)
+	return reClean.ReplaceAllString(str, "")
 }
 
 func Top10(str string) []string {
@@ -23,29 +43,38 @@ func Top10(str string) []string {
 		return []string{}
 	}
 
-	var words []*Word
+	var words []*word
+	var result []string
+	limit := 10
+	strTrimmed := reSpace.ReplaceAllString(str, " ")
+	strSplited := strings.Split(strTrimmed, " ")
 
-	str = reg.ReplaceAllString(str, " ")
-	sptStr := strings.Split(str, " ")
+	for _, val := range strSplited {
+		val = cleanStr(val)
 
-	for _, val := range sptStr {
-		word := findWordByStr(val, words)
+		if val == "" {
+			continue
+		}
 
-		if word != nil {
-			word.increase()
+		existWord := findWordByStr(val, words)
+
+		if existWord != nil {
+			existWord.incHit()
 		} else {
-			words = append(words, &Word{str: val, hit: 1})
+			words = append(words, &word{str: val, hit: 1})
 		}
 	}
 
-	slices.SortFunc(words, func(a, b *Word) int {
+	slices.SortFunc(words, func(a, b *word) int {
 		if a.hit > b.hit {
 			return -1
-		} else if a.hit == b.hit {
-			return 0
-		} else {
-			return 1
 		}
+
+		if a.hit == b.hit {
+			return 0
+		}
+
+		return 1
 	})
 
 	sort.Slice(words, func(i, j int) bool {
@@ -55,29 +84,13 @@ func Top10(str string) []string {
 		return words[i].hit > words[j].hit
 	})
 
-	var res []string
-
-	for i := 0; i < 10; i++ {
-		res = append(res, words[i].str)
+	if len(words) < limit {
+		limit = len(words)
 	}
 
-	/*
-		for _, person := range res {
-			fmt.Printf("%s\n", person)
-		}
-		for _, person := range words {
-			fmt.Printf("%+v\n", *person)
-		}
-	*/
-
-	return res
-}
-
-func findWordByStr(str string, words []*Word) *Word {
-	for _, word := range words {
-		if word.str == str {
-			return word
-		}
+	for i := 0; i < limit; i++ {
+		result = append(result, words[i].str)
 	}
-	return nil
+
+	return result
 }
