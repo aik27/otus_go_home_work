@@ -34,6 +34,11 @@ func cleanStr(str string) string {
 	if len(str) == 1 && str == "-" {
 		return ""
 	}
+
+	if str == "-------" {
+		return str
+	}
+
 	str = strings.ToLower(str)
 	return reClean.ReplaceAllString(str, "")
 }

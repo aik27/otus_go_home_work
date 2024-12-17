@@ -80,3 +80,25 @@ func TestTop10(t *testing.T) {
 		}
 	})
 }
+
+var textLess = `А  она  очень-очень  любила  его.`
+
+func TestLessTop10(t *testing.T) {
+	t.Run("Text have less 10 words", func(t *testing.T) {
+		require.Len(t, Top10(textLess), 5)
+	})
+}
+
+var textExceptions = `----------------  - {},...,''MOBY...DICK'',...{}$^1 MoBy,DiCk MoByDiCk, MoByDiCk!' ------- какой-то какойто`
+
+func TestTop10Exceptions(t *testing.T) {
+	expected := []string{
+		"mobydick",
+		"-------",
+		"moby,dick",
+		"moby...dick",
+		"какой-то",
+		"какойто",
+	}
+	require.Equal(t, expected, Top10(textExceptions))
+}
