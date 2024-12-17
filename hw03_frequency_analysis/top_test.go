@@ -89,7 +89,9 @@ func TestLessTop10(t *testing.T) {
 	})
 }
 
-var textExceptions = `----------------  - {},...,''MOBY...DICK'',...{}$^1 MoBy,DiCk MoByDiCk, MoByDiCk!' ------- какой-то какойто`
+var textExceptions = `----------------  - {},...,''MOBY...DICK'',...{}$^1
+MoBy,DiCk MoByDiCk, MoByDiCk!'
+------- какой-то какойто`
 
 func TestTop10Exceptions(t *testing.T) {
 	expected := []string{
