@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	reSpace = regexp.MustCompile(`\s+`)
-	reClean = regexp.MustCompile(`^[^\p{L}]+|[^\p{L}]+$`)
+	reSpace  = regexp.MustCompile(`\s+`)
+	reClean  = regexp.MustCompile(`^[^\p{L}]+|[^\p{L}]+$`)
+	reExWord = regexp.MustCompile(`^-{2,}$`)
 )
 
 type word struct {
@@ -17,30 +18,16 @@ type word struct {
 	hit int
 }
 
-func (w *word) incHit() {
-	w.hit++
-}
-
-func findWordByStr(str string, words []*word) *word {
-	for _, val := range words {
-		if val.str == str {
-			return val
-		}
-	}
-	return nil
-}
-
 func cleanStr(str string) string {
 	if len(str) == 1 && str == "-" {
 		return ""
 	}
 
-	if str == "-------" {
+	if reExWord.Match([]byte(str)) {
 		return str
 	}
 
-	str = strings.ToLower(str)
-	return reClean.ReplaceAllString(str, "")
+	return reClean.ReplaceAllString(strings.ToLower(str), "")
 }
 
 func Top10(str string) []string {
@@ -48,29 +35,33 @@ func Top10(str string) []string {
 		return []string{}
 	}
 
-	var words []*word
-	var result []string
 	limit := 10
-	strTrimmed := reSpace.ReplaceAllString(str, " ")
-	strSplited := strings.Split(strTrimmed, " ")
+	strTrm := reSpace.ReplaceAllString(str, " ")
+	strSpt := strings.Split(strTrm, " ")
 
-	for _, val := range strSplited {
-		val = cleanStr(val)
+	words := make(map[string]int, len(strSpt))
+	sortedWords := make([]word, 0, len(strSpt))
+	result := make([]string, 0, len(strSpt))
 
-		if val == "" {
+	for _, v := range strSpt {
+		v = cleanStr(v)
+		if v == "" {
 			continue
 		}
 
-		existWord := findWordByStr(val, words)
-
-		if existWord != nil {
-			existWord.incHit()
+		_, ok := words[v]
+		if ok {
+			words[v]++
 		} else {
-			words = append(words, &word{str: val, hit: 1})
+			words[v] = 1
 		}
 	}
 
-	slices.SortFunc(words, func(a, b *word) int {
+	for k, v := range words {
+		sortedWords = append(sortedWords, word{str: k, hit: v})
+	}
+
+	slices.SortFunc(sortedWords, func(a, b word) int {
 		if a.hit > b.hit {
 			return -1
 		}
@@ -82,19 +73,19 @@ func Top10(str string) []string {
 		return 1
 	})
 
-	sort.Slice(words, func(i, j int) bool {
-		if words[i].hit == words[j].hit {
-			return words[i].str < words[j].str
+	sort.Slice(sortedWords, func(i, j int) bool {
+		if sortedWords[i].hit == sortedWords[j].hit {
+			return sortedWords[i].str < sortedWords[j].str
 		}
-		return words[i].hit > words[j].hit
+		return sortedWords[i].hit > sortedWords[j].hit
 	})
 
-	if len(words) < limit {
-		limit = len(words)
+	if len(sortedWords) < limit {
+		limit = len(sortedWords)
 	}
 
 	for i := 0; i < limit; i++ {
-		result = append(result, words[i].str)
+		result = append(result, sortedWords[i].str)
 	}
 
 	return result

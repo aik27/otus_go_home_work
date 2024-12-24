@@ -97,6 +97,7 @@ func TestTop10Exceptions(t *testing.T) {
 	expected := []string{
 		"mobydick",
 		"-------",
+		"----------------",
 		"moby,dick",
 		"moby...dick",
 		"какой-то",
