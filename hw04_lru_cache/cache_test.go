@@ -83,6 +83,20 @@ func TestCache(t *testing.T) {
 		_, ok = c.Get("4")
 		assert.False(t, ok, "Element with key \"4\" still exist.")
 	})
+
+	t.Run("Clear cache", func(t *testing.T) {
+		c := NewCache(5)
+		for i := 0; i < 5; i++ {
+			c.Set(Key(strconv.Itoa(i)), i)
+		}
+
+		c.Clear()
+
+		for i := 0; i < 5; i++ {
+			_, ok := c.Get(Key(strconv.Itoa(i)))
+			assert.False(t, ok, "Element with key \"%d\" still exist.", i)
+		}
+	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
