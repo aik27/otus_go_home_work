@@ -1,12 +1,12 @@
 package hw04lrucache
 
 import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestCache(t *testing.T) {
@@ -49,8 +49,39 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+	t.Run("Capacity exceeded", func(t *testing.T) {
+		c := NewCache(5)
+		for i := 0; i < 10; i++ {
+			c.Set(Key(strconv.Itoa(i)), i)
+		}
+
+		for i := 0; i < 5; i++ {
+			_, ok := c.Get(Key(strconv.Itoa(i)))
+			assert.False(t, ok, "Element with key \"%d\" still exist.", i)
+		}
+	})
+
+	t.Run("Evict less used elements", func(t *testing.T) {
+		c := NewCache(5)
+		for i := 0; i < 5; i++ {
+			c.Set(Key(strconv.Itoa(i)), i)
+		}
+
+		_, ok := c.Get("0")
+		assert.True(t, ok, "Element with key \"0\" doesn't exist.")
+
+		_, ok = c.Get("1")
+		assert.True(t, ok, "Element with key \"1\" doesn't exist.")
+
+		c.Set("2", "new value")
+		c.Set("6", 6)
+		c.Set("7", 7)
+
+		_, ok = c.Get("3")
+		assert.False(t, ok, "Element with key \"3\" still exist.")
+
+		_, ok = c.Get("4")
+		assert.False(t, ok, "Element with key \"4\" still exist.")
 	})
 }
 
