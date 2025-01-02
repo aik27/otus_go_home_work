@@ -48,4 +48,35 @@ func TestList(t *testing.T) {
 		}
 		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
 	})
+
+	t.Run("add and remove elements", func(t *testing.T) {
+		l := NewList()
+
+		l.PushBack(1)  // [1]
+		l.PushBack(2)  // [1, 2]
+		l.PushBack(3)  // [1, 2, 3]
+		l.PushFront(0) // [0, 1, 2, 3]
+
+		require.Equal(t, 4, l.Len())
+		require.Equal(t, 0, l.Front().Value)
+		require.Equal(t, 3, l.Back().Value)
+
+		l.Remove(l.Front()) // [1, 2, 3]
+		require.Equal(t, 3, l.Len())
+		require.Equal(t, 1, l.Front().Value)
+
+		l.Remove(l.Back()) // [1, 2]
+		require.Equal(t, 2, l.Len())
+		require.Equal(t, 2, l.Back().Value)
+
+		l.Remove(l.Front()) // [2]
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, 2, l.Front().Value)
+		require.Equal(t, 2, l.Back().Value)
+
+		l.Remove(l.Front()) // []
+		require.Equal(t, 0, l.Len())
+		require.Nil(t, l.Front())
+		require.Nil(t, l.Back())
+	})
 }
