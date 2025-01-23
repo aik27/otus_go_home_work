@@ -29,23 +29,25 @@ func exec(stage Stage, in In, done In) Out {
 	outChain := make(Bi)
 
 	go func() {
-		//nolint:revive
-		defer func() {
-			for range in {
-			}
-			close(outChain)
-		}()
+		defer close(outChain)
 
 		for {
 			select {
 			case <-done:
+				// fmt.Printf("Stage %d received done signal\n", stageIndex)
 				return
 			case value, ok := <-in:
 				if !ok {
+					// fmt.Printf("Stage %d completed\n", stageIndex)
 					return
 				}
-
-				outChain <- value
+				select {
+				case <-done:
+					// fmt.Printf("Stage %d received done signal while sending\n", stageIndex)
+					return
+				case outChain <- value:
+					// fmt.Printf("Stage %d sent element\n", stageIndex)
+				}
 			}
 		}
 	}()
