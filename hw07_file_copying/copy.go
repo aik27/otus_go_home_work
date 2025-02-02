@@ -2,29 +2,30 @@ package main
 
 import (
 	"errors"
-	"github.com/cheggaaa/pb/v3"
 	"io"
 	"log"
 	"os"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 var (
-	ErrUnsupportedFile       = errors.New("unsupported file")
-	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
-	ErrOffsetNegativeOffset  = errors.New("negative offset is not acceptable")
-	ErrOffsetNegativeLimit   = errors.New("negative limit is not acceptable")
+	ErrUnsupportedFile             = errors.New("unsupported file")
+	ErrOffsetExceedsFileSize       = errors.New("offset exceeds file size")
+	ErrNegativeOffsetNotAcceptable = errors.New("negative offset is not acceptable")
+	ErrNegativeLimitNotAcceptable  = errors.New("negative limit is not acceptable")
 )
 
 func Copy(fromPath, toPath string, offset, limit int64) error {
 	// Place your code here.
 	fileFrom, err := os.Open(fromPath)
-
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		if err := fileFrom.Close(); err != nil {
+		err := fileFrom.Close()
+		if err != nil {
 			log.Printf("Failed to close file %s: %v\n", fromPath, err)
 		}
 	}()
@@ -39,11 +40,11 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	if offset < 0 {
-		return ErrOffsetNegativeOffset
+		return ErrNegativeOffsetNotAcceptable
 	}
 
 	if limit < 0 {
-		return ErrOffsetNegativeLimit
+		return ErrNegativeLimitNotAcceptable
 	}
 
 	if fileFromInfo.Mode()&os.ModeDevice != 0 {
@@ -51,7 +52,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	fileTo, err := os.Create(toPath)
-
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		bar.Add(int(moved))
 
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
