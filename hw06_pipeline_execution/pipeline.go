@@ -29,7 +29,11 @@ func exec(stage Stage, in In, done In) Out {
 	outChain := make(Bi)
 
 	go func() {
-		defer close(outChain)
+		defer func() {
+			close(outChain)
+			for range in {
+			}
+		}()
 
 		for {
 			select {
