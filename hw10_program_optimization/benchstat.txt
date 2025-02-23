@@ -1,0 +1,18 @@
+goos: linux
+goarch: amd64
+pkg: github.com/aik27/otus_go_home_work/hw10_program_optimization
+cpu: 13th Gen Intel(R) Core(TM) i7-13700K
+                 │    old.txt     │               new.txt               │
+                 │     sec/op     │    sec/op     vs base               │
+GetDomainStat-24   131.110m ± ∞ ¹   2.207m ± ∞ ¹  -98.32% (p=0.008 n=5)
+¹ need >= 6 samples for confidence interval at level 0.95
+
+                 │      old.txt       │                new.txt                │
+                 │        B/op        │     B/op       vs base                │
+GetDomainStat-24   236764.481Ki ± ∞ ¹   6.274Ki ± ∞ ¹  -100.00% (p=0.008 n=5)
+¹ need >= 6 samples for confidence interval at level 0.95
+
+                 │     old.txt      │               new.txt               │
+                 │    allocs/op     │  allocs/op   vs base                │
+GetDomainStat-24   2500078.00 ± ∞ ¹   79.00 ± ∞ ¹  -100.00% (p=0.008 n=5)
+¹ need >= 6 samples for confidence interval at level 0.95

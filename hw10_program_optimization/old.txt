@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/aik27/otus_go_home_work/hw10_program_optimization
+cpu: 13th Gen Intel(R) Core(TM) i7-13700K
+BenchmarkGetDomainStat-24    	      85	 131052149 ns/op	242446908 B/op	 2500078 allocs/op
+BenchmarkGetDomainStat-24    	      84	 131645816 ns/op	242446802 B/op	 2500077 allocs/op
+BenchmarkGetDomainStat-24    	      82	 131273841 ns/op	242446829 B/op	 2500078 allocs/op
+BenchmarkGetDomainStat-24    	      90	 131109754 ns/op	242446839 B/op	 2500078 allocs/op
+BenchmarkGetDomainStat-24    	      91	 130891969 ns/op	242446815 B/op	 2500077 allocs/op
+PASS
+ok  	github.com/aik27/otus_go_home_work/hw10_program_optimization	59.015s
