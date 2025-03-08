@@ -26,6 +26,7 @@ func main() {
 
 	if err := client.Connect(); err != nil {
 		fmt.Fprintln(os.Stderr, "Connection error:", err)
+		os.Exit(1)
 	}
 
 	defer func() {
