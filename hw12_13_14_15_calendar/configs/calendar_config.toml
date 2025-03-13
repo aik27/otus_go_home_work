@@ -1,3 +1,5 @@
+Environment = "dev"
+Port = "9091"
 [logger]
 level = "INFO"
 

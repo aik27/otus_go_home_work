@@ -2,18 +2,17 @@ package app
 
 import (
 	"context"
+	cfg "github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/config"
+	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/logger"
 )
 
 type App struct { // TODO
 }
 
-type Logger interface { // TODO
-}
-
 type Storage interface { // TODO
 }
 
-func New(logger Logger, storage Storage) *App {
+func New(logger *logger.Logger, storage Storage, config *cfg.Config) *App {
 	return &App{}
 }
 
