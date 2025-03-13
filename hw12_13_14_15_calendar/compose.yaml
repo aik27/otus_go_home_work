@@ -1,0 +1,63 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./.docker/app/Dockerfile
+
+    hostname: otus_calendar-app
+    container_name: otus_calendar-app
+
+    networks:
+      - otus_network
+
+    ports:
+      - "9090:80"
+
+    restart: unless-stopped
+
+    env_file:
+      - configs/calendar.env
+
+  pgsql:
+    user: ${DOCKER_UID:?err}:${DOCKER_GID:?err}
+
+    build:
+      context: ./
+      dockerfile: ./.docker/pgsql/Dockerfile
+
+      args:
+        DOCKER_UID: ${DOCKER_UID:?err}
+        DOCKER_GID: ${DOCKER_GID:?err}
+
+    hostname: otus_pgsql
+    container_name: otus_pgsql
+
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:?err}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?err}
+      - POSTGRES_DB=${DB_DATABASE:?err}
+      - PGDATA=/var/lib/postgresql/data/db_data/
+
+    networks:
+      - otus_network
+
+    expose:
+      - "5432/tcp"
+    ports:
+      - "54321:5432"
+
+    restart: unless-stopped
+
+    volumes:
+      - .docker/pgsql/data:/var/lib/postgresql/data:delegated
+      - .docker/pgsql/initdb.d:/docker-entrypoint-initdb.d:cached
+
+    env_file:
+      - configs/calendar.env
+
+networks:
+  otus_network:
+    name: otus_network
+    external: true
