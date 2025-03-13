@@ -13,7 +13,7 @@ services:
       - otus_network
 
     ports:
-      - "9090:80"
+      - "9090:9090"
 
     restart: unless-stopped
 

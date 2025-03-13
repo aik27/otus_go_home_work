@@ -18,6 +18,12 @@ linters-settings:
           - $gostd
           - github.com/cheggaaa/pb
           - github.com/json-iterator/go
+          - github.com/joho/godotenv
+          - github.com/kelseyhightower/envconfig
+          - github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar
+          - github.com/jmoiron/sqlx
+          - github.com/pressly/goose
+          - github.com/jackc/pgx/stdlib
       Test:
         files:
           - $test
@@ -72,7 +78,6 @@ linters:
     - predeclared
     - revive
     - staticcheck
-    - stylecheck
     - tagliatelle
     - thelper
     - typecheck
