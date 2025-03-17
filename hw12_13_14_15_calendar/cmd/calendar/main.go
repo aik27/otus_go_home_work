@@ -11,15 +11,26 @@ import (
 
 	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/app"
 	cfg "github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/config"
-	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/db"
 	log "github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/storage"
+	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar/internal/storage/sql"
 	_ "github.com/jackc/pgx/stdlib"
-	"github.com/jmoiron/sqlx"
 )
 
+/**
+docker compose --env-file configs/calendar.env up -d
+goose -dir ./internal/db/migrations postgres "user=otus dbname=calendar
+password=otus port=54321 host=localhost sslmode=disable" up
+*/
+
 var configFile string
+
+const (
+	storageTypeSql    = "sql"
+	storageTypeMemory = "memory"
+)
 
 func init() {
 	flag.StringVar(&configFile, "config", "/etc/calendar/calendar.env", "Path to configuration file")
@@ -36,31 +47,16 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
 
-	config := cfg.NewConfig(configFile)
+	config := cfg.New(configFile)
 	logger := log.New(config.LogLevel)
 
-	database, err := sqlx.Open("pgx", config.GetDbDsn())
-	defer func(db *sqlx.DB) {
-		err := db.Close()
-		if err != nil {
-			panic(fmt.Errorf("failed to close database connection: %w", err))
-		}
-	}(database)
-
+	repository, err := getStorage(config.StorageType, config)
 	if err != nil {
-		panic(fmt.Errorf("failed to load driver: %w", err))
+		panic(err.Error())
 	}
 
-	err = database.PingContext(ctx)
-	if err != nil {
-		panic(fmt.Errorf("failed to connect to database: %w", err))
-	}
-
-	db.Migrate(database)
-
-	storage := memorystorage.New()
-	calendar := app.New(logger, storage, config)
-	server := internalhttp.NewServer(logger, calendar, config)
+	calendar := app.New(logger, config, repository)
+	server := internalhttp.NewServer(logger, config, calendar)
 
 	go func() {
 		<-ctx.Done()
@@ -79,5 +75,18 @@ func main() {
 		logger.Error("failed to start http server: " + err.Error())
 		cancel()
 		os.Exit(1) //nolint:gocritic
+	}
+}
+
+func getStorage(storageType string, config *cfg.Config) (storage.Repository, error) {
+	switch storageType {
+	case storageTypeSql:
+		res, err := sqlstorage.New(config.GetDbDsn())
+		return res, err
+	case storageTypeMemory:
+		res := memorystorage.New()
+		return res, nil
+	default:
+		return nil, fmt.Errorf("unknown storage type: %s", storageType)
 	}
 }

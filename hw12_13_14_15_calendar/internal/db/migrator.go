@@ -1,9 +1,10 @@
 package db
 
 import (
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose"
-	"log"
 )
 
 func Migrate(db *sqlx.DB) {
