@@ -2,10 +2,11 @@ package logger
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"io"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestLogger(t *testing.T) {
