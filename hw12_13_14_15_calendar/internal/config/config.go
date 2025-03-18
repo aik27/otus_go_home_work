@@ -9,15 +9,18 @@ import (
 
 //nolint:stylecheck
 type Config struct {
-	Environment string
-	Port        int
-	StorageType string `split_words:"true"`
-	LogLevel    string `split_words:"true"`
-	DbHost      string `split_words:"true"`
-	DbPort      int    `split_words:"true"`
-	DbUsername  string `split_words:"true"`
-	DbPassword  string `split_words:"true"`
-	DbDatabase  string `split_words:"true"`
+	Environment            string
+	StorageType            string `split_words:"true"`
+	LogLevel               string `split_words:"true"`
+	DbHost                 string `split_words:"true"`
+	DbPort                 int    `split_words:"true"`
+	DbUsername             string `split_words:"true"`
+	DbPassword             string `split_words:"true"`
+	DbDatabase             string `split_words:"true"`
+	HttpServerHost         string `split_words:"true"`
+	HttpServerPort         string `split_words:"true"`
+	HttpServerReadTimeout  int64  `split_words:"true"`
+	HttpServerWriteTimeout int64  `split_words:"true"`
 }
 
 func (c *Config) GetDbDsn() string {

@@ -55,8 +55,8 @@ func main() {
 		panic(err.Error())
 	}
 
-	calendar := app.New(logger, config, repository)
-	server := internalhttp.NewServer(logger, config, calendar)
+	calendar := app.New(config, logger, repository)
+	server := internalhttp.New(config, logger, calendar)
 
 	go func() {
 		<-ctx.Done()
