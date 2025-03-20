@@ -30,6 +30,7 @@ linters-settings:
         allow:
           - $gostd
           - github.com/stretchr/testify
+          - github.com/aik27/otus_go_home_work/hw12_13_14_15_calendar
 issues:
   exclude-rules:
     - path: _test\.go
